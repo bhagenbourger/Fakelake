@@ -1,80 +1,35 @@
-use crate::config::Config;
-use crate::errors::FakeLakeError;
-use crate::generate::output_format::OutputFormat;
-use crate::providers::provider::Value;
+use std::fs::File;
 
-use csv::WriterBuilder;
+use crate::{config::Config, generate::output_format::OutputFormat};
+
+use arrow_array::RecordBatch;
+use arrow_csv::{Writer, WriterBuilder};
 
 const CSV_EXTENSION: &str = ".csv";
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct OutputCsv {
-    delimiter: u8,
+    writer: Writer<File>,
 }
 
 impl OutputCsv {
-    pub fn new(delimiter: u8) -> OutputCsv {
-        OutputCsv { delimiter }
+    pub fn new(delimiter: u8, config: &Config) -> OutputCsv {
+        let file_name = config.get_output_file_name(CSV_EXTENSION);
+        let file = std::fs::File::create(file_name).unwrap();
+        OutputCsv {
+            writer: WriterBuilder::new().with_delimiter(delimiter).build(file),
+        }
     }
 }
 
 impl OutputFormat for OutputCsv {
+    fn flush(&mut self) {
+    }
     fn get_extension(&self) -> &str {
         CSV_EXTENSION
     }
-
-    fn generate_from_config(&self, config: &Config) -> Result<(), FakeLakeError> {
-        if config.columns.is_empty() {
-            return Err(FakeLakeError::BadYAMLFormat(
-                "No columns to generate".to_string(),
-            ));
-        }
-
-        let file_name = config.get_output_file_name(self.get_extension());
-        let rows = config.get_number_of_rows();
-
-        let mut wtr = match WriterBuilder::new()
-            .delimiter(self.delimiter)
-            .from_path(file_name)
-        {
-            Ok(value) => value,
-            Err(e) => {
-                return Err(FakeLakeError::CSVError(e));
-            }
-        };
-
-        let mut column_names: Vec<&str> = vec![];
-        for column in &config.columns {
-            column_names.push(&column.name);
-        }
-        if let Err(e) = wtr.write_record(column_names) {
-            return Err(FakeLakeError::CSVError(e));
-        }
-
-        for i in 0..rows {
-            let mut row: Vec<String> = vec![];
-            for column in &config.columns {
-                let mut str_value = "".to_string();
-                if column.is_next_present() {
-                    str_value = match column.provider.value(i) {
-                        Value::Bool(value) => value.to_string(),
-                        Value::Int32(value) => value.to_string(),
-                        Value::Float64(value) => value.to_string(),
-                        Value::String(value) => value,
-                        Value::Date(value, date_format) => value.format(&date_format).to_string(),
-                        Value::Timestamp(value, date_format) => {
-                            value.format(&date_format).to_string()
-                        }
-                    };
-                }
-                row.push(str_value);
-            }
-            if let Err(e) = wtr.write_record(row) {
-                return Err(FakeLakeError::CSVError(e));
-            }
-        }
-
-        Ok(())
+    fn write(&mut self, batch: &RecordBatch) {
+        self.writer.write(batch).expect("Writing batch");
     }
 }
 

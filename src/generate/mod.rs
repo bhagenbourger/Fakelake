@@ -48,7 +48,7 @@ fn generate_from_string(_: &PathBuf, file_content: String) -> Result<(), FakeLak
 }
 
 pub fn generate_from_config(config: config::Config) -> Result<(), FakeLakeError> {
-    let output = get_corresponding_output(&config);
+    let mut output = get_corresponding_output(&config);
     output.generate_from_config(&config)
 }
 
@@ -56,19 +56,19 @@ fn get_corresponding_output(config: &config::Config) -> Box<dyn OutputFormat> {
     match &config.info {
         Some(info) => match &info.output_format {
             Some(output_format) => match output_format {
-                config::OutputType::Parquet() => Box::new(OutputParquet),
-                config::OutputType::Csv(value) => Box::new(OutputCsv::new(*value)),
-                config::OutputType::Json(value) => Box::new(OutputJson::new(*value)),
+                config::OutputType::Parquet() => Box::new(OutputParquet::new(config)),
+                config::OutputType::Csv(value) => Box::new(OutputCsv::new(*value, config)),
+                config::OutputType::Json(_value) => Box::new(OutputJson::new(config)),
             },
-            None => wrong_format(),
+            None => wrong_format(config),
         },
-        None => wrong_format(),
+        None => wrong_format(config),
     }
 }
 
-fn wrong_format() -> Box<dyn OutputFormat> {
+fn wrong_format(config: &config::Config) -> Box<dyn OutputFormat> {
     warn!("No output format specified, the file will be in parquet.");
-    Box::new(OutputParquet)
+    Box::new(OutputParquet::new(config))
 }
 
 #[cfg(test)]

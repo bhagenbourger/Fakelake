@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 arrow-array = "50.0.0"
+arrow-csv = "50.0.0"
+arrow-json = "50.0.0"
 arrow-schema = "50.0.0"
 chrono = "0.4.31"
 clap = { version = "4.4.10", features = ["derive"] }

@@ -2,37 +2,23 @@ pub mod batch_generator;
 pub mod utils;
 
 use crate::config::Config;
-use crate::errors::FakeLakeError;
 use crate::generate::output_format::OutputFormat;
-use batch_generator::{parquet_batch_generator_builder, ParquetBatchGenerator};
 
-use arrow_array::{ArrayRef, Int32Array, RecordBatch};
+use arrow_array::RecordBatch;
 use arrow_schema::{Field, Schema};
 use log::debug;
 use parquet::{arrow::ArrowWriter, basic::Compression, file::properties::WriterProperties};
-use rayon::prelude::*;
-use std::sync::{Arc, Mutex};
+use std::{fs::File, sync::Arc};
 
 const PARQUET_EXTENSION: &str = ".parquet";
 
-#[derive(Debug, PartialEq)]
-pub struct OutputParquet;
+#[derive(Debug)]
+pub struct OutputParquet {
+    pub writer: ArrowWriter<File>,
+}
 
-impl OutputFormat for OutputParquet {
-    fn get_extension(&self) -> &str {
-        PARQUET_EXTENSION
-    }
-
-    fn generate_from_config(&self, config: &Config) -> Result<(), FakeLakeError> {
-        if config.columns.is_empty() {
-            return Err(FakeLakeError::BadYAMLFormat(
-                "No columns to generate".to_string(),
-            ));
-        }
-
-        let file_name = config.get_output_file_name(self.get_extension());
-        let rows = config.get_number_of_rows();
-
+impl OutputParquet {
+    pub fn new(config: &Config) -> OutputParquet {
         let schema = get_schema_from_config(config);
         debug!("Writing schema: {:?}", schema);
 
@@ -41,48 +27,23 @@ impl OutputFormat for OutputParquet {
             .set_compression(Compression::SNAPPY)
             .build();
 
-        let batch_size = 8192 * 8;
-        // ceil division
-        let iterations = (rows as f64 / batch_size as f64).ceil() as u32;
-
+        let file_name = config.get_output_file_name(PARQUET_EXTENSION);
         let file = std::fs::File::create(file_name).unwrap();
-        let mut writer = ArrowWriter::try_new(file, Arc::new(schema.clone()), Some(props)).unwrap();
-
-        let mut schema_cols: Vec<(String, ArrayRef)> = Vec::new();
-        let mut provider_generators: Vec<Box<dyn ParquetBatchGenerator>> = Vec::new();
-        config.columns.clone().into_iter().for_each(|column| {
-            schema_cols.push((
-                column.clone().name,
-                Arc::new(Int32Array::from(vec![0])) as ArrayRef,
-            ));
-            provider_generators.push(parquet_batch_generator_builder(column.clone()))
-        });
-
-        for i in 0..iterations {
-            debug!("Generating batch {} of {}...", i, iterations);
-            let rows_to_generate = if i == iterations - 1 {
-                rows - (i * batch_size)
-            } else {
-                batch_size
-            };
-
-            let schema_cols: Mutex<Vec<(String, ArrayRef)>> = Mutex::new(schema_cols.clone());
-            let provider_generators = provider_generators.clone();
-
-            provider_generators.into_par_iter().enumerate().for_each(
-                |(index, provider_generator)| {
-                    let array = provider_generator.batch_array(rows_to_generate);
-                    schema_cols.lock().unwrap()[index] =
-                        (provider_generator.name().to_string(), array);
-                },
-            );
-
-            let batch = RecordBatch::try_from_iter(schema_cols.lock().unwrap().clone()).unwrap();
-            writer.write(&batch).expect("Writing batch");
+        OutputParquet {
+            writer: ArrowWriter::try_new(file, Arc::new(schema.clone()), Some(props)).unwrap(),
         }
-        // writer must be closed to write footer
-        writer.close().unwrap();
-        Ok(())
+    }
+}
+
+impl OutputFormat for OutputParquet {
+    fn flush(&mut self) {
+        self.writer.flush().unwrap();
+    }
+    fn get_extension(&self) -> &str {
+        PARQUET_EXTENSION
+    }
+    fn write(&mut self, batch: &RecordBatch) {
+        self.writer.write(batch).expect("Writing batch");
     }
 }
 

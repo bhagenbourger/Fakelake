@@ -5,4 +5,4 @@ columns:
 info:
   output_name: one_row
   output_format: parquet
-  rows: 1
+  rows: 10

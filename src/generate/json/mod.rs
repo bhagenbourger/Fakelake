@@ -1,81 +1,35 @@
-use crate::config::Config;
-use crate::errors::FakeLakeError;
-use crate::generate::output_format::OutputFormat;
-use crate::providers::provider::Value;
-use serde_json::Value as sv;
-use serde_json::{Map, Number};
 use std::fs::File;
-use std::io::{BufWriter, Write};
+
+use crate::{config::Config, generate::output_format::OutputFormat};
+use arrow_array::RecordBatch;
+use arrow_json::writer::LineDelimitedWriter;
 
 const JSON_EXTENSION: &str = ".json";
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct OutputJson {
-    wrap_up: bool,
+    writer: LineDelimitedWriter<File>,
 }
 
 impl OutputJson {
-    pub fn new(wrap_up: bool) -> OutputJson {
-        OutputJson { wrap_up }
+    pub fn new(config: &Config) -> OutputJson {
+        let file_name = config.get_output_file_name(JSON_EXTENSION);
+        let file = std::fs::File::create(file_name).unwrap();
+        OutputJson {
+            writer: LineDelimitedWriter::new(file),
+        }
     }
 }
 
 impl OutputFormat for OutputJson {
+    fn flush(&mut self) {
+        self.writer.finish().unwrap();
+    }
     fn get_extension(&self) -> &str {
         JSON_EXTENSION
     }
-
-    fn generate_from_config(&self, config: &Config) -> Result<(), FakeLakeError> {
-        if config.columns.is_empty() {
-            return Err(FakeLakeError::BadYAMLFormat(
-                "No columns to generate".to_string(),
-            ));
-        }
-
-        let file_name = config.get_output_file_name(self.get_extension());
-        let mut buffer = BufWriter::new(File::create(file_name)?);
-        let rows = config.get_number_of_rows();
-        let mut json = Vec::<sv>::new();
-
-        for i in 0..rows {
-            let mut row = Map::new();
-            for column in &config.columns {
-                if column.is_next_present() {
-                    let str_value = match column.provider.value(i) {
-                        Value::Bool(value) => sv::Bool(value),
-                        Value::Int32(value) => sv::Number(Number::from(value)),
-                        Value::Float64(value) => sv::Number(Number::from_f64(value).unwrap()),
-                        Value::String(value) => sv::String(value),
-                        Value::Date(value, date_format) => {
-                            sv::String(value.format(&date_format).to_string())
-                        }
-                        Value::Timestamp(value, date_format) => {
-                            sv::String(value.format(&date_format).to_string())
-                        }
-                    };
-                    row.insert(column.name.to_string(), str_value);
-                }
-            }
-
-            if self.wrap_up {
-                json.insert(i.try_into().unwrap(), sv::Object(row));
-            } else {
-                if let Err(e) = serde_json::to_writer(&mut buffer, &row) {
-                    return Err(FakeLakeError::JSONError(e));
-                }
-                if let Err(e) = buffer.write(b"\n") {
-                    return Err(FakeLakeError::IOError(e));
-                }
-            }
-        }
-
-        if self.wrap_up {
-            if let Err(e) = serde_json::to_writer(&mut buffer, &json) {
-                return Err(FakeLakeError::JSONError(e));
-            }
-        }
-
-        Ok(())
+    fn write(&mut self, batch: &RecordBatch) {
+        self.writer.write(batch).expect("Writing batch");
     }
 }
 
