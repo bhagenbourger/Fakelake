@@ -194,10 +194,7 @@ impl Info {
         let rows = match section_info["rows"].as_i64() {
             Some(rows) => Some(rows as u32),
             None => match section_info["rows"].as_str() {
-                Some(rows) => match rows.replace('_', "").parse::<u32>() {
-                    Ok(value) => Some(value),
-                    Err(_) => None,
-                },
+                Some(rows) => rows.replace('_', "").parse::<u32>().ok()
                 None => None,
             },
         };
@@ -206,10 +203,7 @@ impl Info {
         let seed = match section_info["seed"].as_i64() {
             Some(seed) => Some(seed as u64),
             None => match section_info["seed"].as_str() {
-                Some(seed_str) => match seed_str.replace('_', "").parse::<u64>() {
-                    Ok(value) => Some(value),
-                    Err(_) => None,
-                },
+                Some(seed_str) => seed_str.replace('_', "").parse::<u64>().ok(),
                 None => None,
             },
         };

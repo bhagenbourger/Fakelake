@@ -74,8 +74,8 @@ pub fn new_from_yaml(column: &Yaml) -> Box<dyn Presence> {
     let parameter = PercentageParameter::new(column, "presence", 1.0);
 
     match parameter.value {
-        value if value == 0.0 => Box::new(NeverPresent {}),
-        value if value == 1.0 => Box::new(AlwaysPresent {}),
+        0.0 => Box::new(NeverPresent {}),
+        1.0 => Box::new(AlwaysPresent {}),
         value => Box::new(SometimesPresent { presence: value }),
     }
 }

@@ -2,7 +2,6 @@ use std::iter::repeat_with;
 
 pub fn random_alphanumeric(n: u32) -> String {
     repeat_with(crate::rng::alphanumeric)
-        .map(char::from)
         .take(n as usize)
         .collect()
 }
