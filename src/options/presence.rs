@@ -36,7 +36,7 @@ struct SometimesPresent {
 
 impl Presence for SometimesPresent {
     fn is_next_present(&self) -> bool {
-        let rnd: f64 = fastrand::f64();
+        let rnd: f64 = crate::rng::f64();
         if rnd > self.presence {
             return false;
         }

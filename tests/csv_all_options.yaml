@@ -82,3 +82,4 @@ info:
   output_name: target/csv_all_options
   output_format: csv
   rows: 174_957
+  seed: 12345

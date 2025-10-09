@@ -21,14 +21,14 @@ pub struct DatetimeProvider {
 impl Provider for DatetimeProvider {
     fn value(&self, _: u32) -> Value {
         Value::Timestamp(
-            DateTime::from_timestamp(fastrand::i64(self.after..self.before), 0).unwrap(),
+            DateTime::from_timestamp(crate::rng::i64(self.after..self.before), 0).unwrap(),
             self.format.clone(),
         )
     }
     fn corrupted_value(&self, _: u32) -> Value {
         Value::Timestamp(
             DateTime::from_timestamp(
-                fastrand::i64(MIN_TIMESTAMP.timestamp()..MAX_TIMESTAMP.timestamp()),
+                crate::rng::i64(MIN_TIMESTAMP.timestamp()..MAX_TIMESTAMP.timestamp()),
                 0,
             )
             .unwrap(),

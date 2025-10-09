@@ -7,7 +7,7 @@ pub struct BoolProvider {}
 
 impl Provider for BoolProvider {
     fn value(&self, _: u32) -> Value {
-        Value::Bool(fastrand::bool())
+        Value::Bool(crate::rng::bool())
     }
     fn corrupted_value(&self, index: u32) -> Value {
         // Corrupted boolean is not valid

@@ -37,7 +37,7 @@ impl WeightedListStringProvider {
     }
 
     fn weighted_random(&self) -> String {
-        let random: u32 = fastrand::u32(0..self.sum) + 1;
+        let random: u32 = crate::rng::u32(0..self.sum) + 1;
         self.get_from_weight(random)
     }
 

@@ -136,6 +136,8 @@ pub struct Info {
     /// By default, output_format is Parquet
     pub output_format: Option<OutputType>,
     pub rows: Option<u32>,
+    /// Seed for deterministic random generation
+    pub seed: Option<u64>,
 }
 
 impl Info {
@@ -200,10 +202,23 @@ impl Info {
             },
         };
 
+        // seed could be i64 or str (i64 with _ separators)
+        let seed = match section_info["seed"].as_i64() {
+            Some(seed) => Some(seed as u64),
+            None => match section_info["seed"].as_str() {
+                Some(seed_str) => match seed_str.replace('_', "").parse::<u64>() {
+                    Ok(value) => Some(value),
+                    Err(_) => None,
+                },
+                None => None,
+            },
+        };
+
         Ok(Info {
             output_name,
             output_format,
             rows,
+            seed,
         })
     }
 }
@@ -220,6 +235,9 @@ pub fn get_config_from_string(file_content: String) -> Result<Config, FakeLakeEr
     };
 
     let info = Info::parse_info_section(&parsed_yaml).unwrap();
+
+    // Initialize the global RNG with the seed from the config
+    crate::rng::initialize_rng(info.seed);
 
     let config = Config {
         columns,

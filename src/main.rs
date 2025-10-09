@@ -5,6 +5,7 @@ mod generate;
 mod logger;
 mod options;
 mod providers;
+mod rng;
 
 use crate::cli::{Cli, Commands};
 use crate::generate::generate_from_paths;

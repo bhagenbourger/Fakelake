@@ -16,10 +16,10 @@ pub struct I32Provider {
 
 impl Provider for I32Provider {
     fn value(&self, _: u32) -> Value {
-        Value::Int32(fastrand::i32(self.min..self.max))
+        Value::Int32(crate::rng::i32(self.min..self.max))
     }
     fn corrupted_value(&self, _: u32) -> Value {
-        Value::Int32(fastrand::i32(i32::MIN..i32::MAX))
+        Value::Int32(crate::rng::i32(i32::MIN..i32::MAX))
     }
 }
 

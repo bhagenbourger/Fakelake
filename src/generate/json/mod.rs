@@ -113,6 +113,7 @@ mod tests {
                 output_name: name,
                 output_format: Some(OutputType::Json(true)),
                 rows,
+                seed: None,
             }),
         }
     }
@@ -221,6 +222,7 @@ mod tests {
                 output_name: Some("target/test_generated/output_name".to_string()),
                 output_format: Some(OutputType::Json(true)),
                 rows: Some(1000),
+                seed: None,
             }),
         };
 
@@ -247,6 +249,7 @@ mod tests {
                 output_name: Some("target/test_generated/output_wrap_up".to_string()),
                 output_format: Some(OutputType::Json(true)),
                 rows: Some(5),
+                seed: None,
             }),
         };
 
@@ -278,6 +281,7 @@ mod tests {
                 output_name: Some("target/test_generated/output_not_wrap_up".to_string()),
                 output_format: Some(OutputType::Json(false)),
                 rows: Some(5),
+                seed: None,
             }),
         };
 

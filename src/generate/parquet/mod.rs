@@ -130,6 +130,7 @@ mod tests {
                 output_name: None,
                 output_format: None,
                 rows: None,
+                seed: None,
             }),
         };
         let schema = get_schema_from_config(&config);
@@ -159,6 +160,7 @@ mod tests {
                 output_name: Some("target/test_generated/not_default_file".to_string()),
                 output_format: None,
                 rows: None,
+                seed: None,
             }),
         };
 
@@ -178,6 +180,7 @@ mod tests {
                 output_name: Some("target/test_generated/not_default_file".to_string()),
                 output_format: None,
                 rows: None,
+                seed: None,
             }),
         };
 
