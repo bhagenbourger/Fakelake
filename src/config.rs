@@ -194,7 +194,7 @@ impl Info {
         let rows = match section_info["rows"].as_i64() {
             Some(rows) => Some(rows as u32),
             None => match section_info["rows"].as_str() {
-                Some(rows) => rows.replace('_', "").parse::<u32>().ok()
+                Some(rows) => rows.replace('_', "").parse::<u32>().ok(),
                 None => None,
             },
         };
