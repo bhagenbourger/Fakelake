@@ -99,8 +99,8 @@ fn get_schema_from_config(config: &Config) -> Schema {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
     use ctor::ctor;
+    use std::fs;
 
     use super::*;
     use crate::config::{Column, Config, Info};
