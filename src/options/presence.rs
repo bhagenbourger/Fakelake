@@ -36,7 +36,7 @@ struct SometimesPresent {
 
 impl Presence for SometimesPresent {
     fn is_next_present(&self) -> bool {
-        let rnd: f64 = fastrand::f64();
+        let rnd: f64 = crate::rng::f64();
         if rnd > self.presence {
             return false;
         }
@@ -74,8 +74,8 @@ pub fn new_from_yaml(column: &Yaml) -> Box<dyn Presence> {
     let parameter = PercentageParameter::new(column, "presence", 1.0);
 
     match parameter.value {
-        value if value == 0.0 => Box::new(NeverPresent {}),
-        value if value == 1.0 => Box::new(AlwaysPresent {}),
+        0.0 => Box::new(NeverPresent {}),
+        1.0 => Box::new(AlwaysPresent {}),
         value => Box::new(SometimesPresent { presence: value }),
     }
 }

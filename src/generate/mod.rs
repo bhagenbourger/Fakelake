@@ -109,6 +109,7 @@ mod tests {
             output_name: None,
             output_format: None,
             rows: None,
+            seed: None,
         });
         let config = Config {
             columns: Vec::new(),
@@ -125,6 +126,7 @@ mod tests {
             output_name: None,
             output_format: Some(OutputType::Parquet()),
             rows: None,
+            seed: None,
         });
         let config = Config {
             columns: Vec::new(),

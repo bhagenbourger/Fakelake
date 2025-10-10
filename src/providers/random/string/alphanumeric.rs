@@ -14,12 +14,12 @@ pub struct AlphanumericProvider {
 
 impl Provider for AlphanumericProvider {
     fn value(&self, _: u32) -> Value {
-        Value::String(random_alphanumeric(fastrand::u32(
+        Value::String(random_alphanumeric(crate::rng::u32(
             self.min_length..self.max_length,
         )))
     }
     fn corrupted_value(&self, _: u32) -> Value {
-        Value::String(random_characters(fastrand::u32(
+        Value::String(random_characters(crate::rng::u32(
             self.min_length..self.max_length,
         )))
     }

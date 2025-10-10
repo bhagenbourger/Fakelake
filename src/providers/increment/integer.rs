@@ -1,7 +1,6 @@
 use crate::providers::parameters::i32::I32Parameter;
 use crate::providers::provider::{Provider, Value};
 
-use fastrand;
 use yaml_rust::Yaml;
 
 const DEFAULT_START: i32 = 0;
@@ -19,7 +18,7 @@ impl Provider for IncrementIntegerProvider {
     }
     fn corrupted_value(&self, _: u32) -> Value {
         // return random i32
-        Value::Int32(fastrand::i32(i32::MIN..i32::MAX))
+        Value::Int32(crate::rng::i32(i32::MIN..i32::MAX))
     }
 }
 

@@ -18,7 +18,7 @@ impl ListStringProvider {
 
 impl Provider for ListStringProvider {
     fn value(&self, _: u32) -> Value {
-        let index = fastrand::usize(..self.data.len());
+        let index = crate::rng::usize(..self.data.len());
         Value::String(self.data[index].to_string())
     }
 

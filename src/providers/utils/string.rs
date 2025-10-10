@@ -1,7 +1,7 @@
 use std::iter::repeat_with;
 
 pub fn random_alphanumeric(n: u32) -> String {
-    repeat_with(fastrand::alphanumeric)
+    repeat_with(crate::rng::alphanumeric)
         .take(n as usize)
         .collect()
 }
@@ -11,7 +11,7 @@ const MAX_CHAR: u32 = 0x10FFFF - EXCLUDE_CHAR_RANGE;
 
 pub fn random_characters(n: u32) -> String {
     repeat_with(|| {
-        let random_char = fastrand::u32(0..=MAX_CHAR);
+        let random_char = crate::rng::u32(0..MAX_CHAR + 1);
 
         let shifted_char = match random_char {
             result if result >= 0xD800 => result + EXCLUDE_CHAR_RANGE,

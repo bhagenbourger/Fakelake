@@ -22,13 +22,13 @@ pub struct DateProvider {
 impl Provider for DateProvider {
     fn value(&self, _: u32) -> Value {
         Value::Date(
-            NaiveDate::from_num_days_from_ce_opt(fastrand::i32(self.after..self.before)).unwrap(),
+            NaiveDate::from_num_days_from_ce_opt(crate::rng::i32(self.after..self.before)).unwrap(),
             self.format.clone(),
         )
     }
     fn corrupted_value(&self, _: u32) -> Value {
         Value::Date(
-            NaiveDate::from_num_days_from_ce_opt(fastrand::i32(
+            NaiveDate::from_num_days_from_ce_opt(crate::rng::i32(
                 MIN_DATE.num_days_from_ce()..MAX_DATE.num_days_from_ce(),
             ))
             .unwrap(),

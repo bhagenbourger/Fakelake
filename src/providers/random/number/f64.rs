@@ -16,10 +16,10 @@ pub struct F64Provider {
 
 impl Provider for F64Provider {
     fn value(&self, _: u32) -> Value {
-        Value::Float64(fastrand_contrib::f64_range(self.min..self.max))
+        Value::Float64(crate::rng::f64_range(self.min..self.max))
     }
     fn corrupted_value(&self, _: u32) -> Value {
-        Value::Float64(fastrand_contrib::f64_range(f64::MIN..f64::MAX))
+        Value::Float64(crate::rng::f64_range(f64::MIN..f64::MAX))
     }
 }
 

@@ -50,7 +50,7 @@ impl Clone for CorruptedProvider {
 
 impl Provider for CorruptedProvider {
     fn value(&self, index: u32) -> Value {
-        let rnd: f64 = fastrand::f64();
+        let rnd: f64 = crate::rng::f64();
         match rnd < self.corrupted {
             true => self.corrupted_value(index),
             false => self.provider.value(index),

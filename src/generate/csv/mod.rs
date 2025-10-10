@@ -111,6 +111,7 @@ mod tests {
                 output_name: name,
                 output_format: Some(OutputType::Csv(5)),
                 rows,
+                seed: None,
             }),
         }
     }
@@ -219,6 +220,7 @@ mod tests {
                 output_name: Some("target/test_generated/output_name".to_string()),
                 output_format: Some(OutputType::Csv(5)),
                 rows: Some(1000),
+                seed: None,
             }),
         };
 
