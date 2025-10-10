@@ -99,6 +99,7 @@ fn get_schema_from_config(config: &Config) -> Schema {
 
 #[cfg(test)]
 mod tests {
+    use ctor::ctor;
     use std::fs;
 
     use super::*;
@@ -106,7 +107,6 @@ mod tests {
     use crate::options::presence;
     use crate::providers::increment::integer::IncrementIntegerProvider;
 
-    use ctor::ctor;
     use yaml_rust::YamlLoader;
 
     #[ctor]
@@ -138,13 +138,11 @@ mod tests {
         assert_eq!(schema.fields().len(), 1);
         assert_eq!(schema.fields()[0].name(), "id");
     }
-
     #[test]
     fn given_get_extension() {
         let output_parquet = OutputParquet {};
         assert_eq!(output_parquet.get_extension(), ".parquet");
     }
-
     #[test]
     fn given_normal_config_should_generate_file() {
         let columns = vec![Column {
@@ -170,7 +168,6 @@ mod tests {
             _ => panic!(),
         }
     }
-
     #[test]
     fn given_no_column_should_not_generate_file() {
         let columns = Vec::new();
