@@ -100,6 +100,7 @@ fn get_schema_from_config(config: &Config) -> Schema {
 #[cfg(test)]
 mod tests {
     use std::fs;
+    use ctor::ctor;
 
     use super::*;
     use crate::config::{Column, Config, Info};
@@ -108,13 +109,13 @@ mod tests {
 
     use yaml_rust::YamlLoader;
 
+    #[ctor]
     fn init() {
         fs::create_dir_all("target/test_generated").ok();
     }
 
     #[test]
     fn given_config_get_schema() {
-        init();
         let columns = vec![Column {
             name: "id".to_string(),
             provider: Box::new(IncrementIntegerProvider { start: 0, step: 1 }),
@@ -139,13 +140,11 @@ mod tests {
     }
     #[test]
     fn given_get_extension() {
-        init();
         let output_parquet = OutputParquet {};
         assert_eq!(output_parquet.get_extension(), ".parquet");
     }
     #[test]
     fn given_normal_config_should_generate_file() {
-        init();
         let columns = vec![Column {
             name: "id".to_string(),
             provider: Box::new(IncrementIntegerProvider { start: 0, step: 1 }),
@@ -171,7 +170,6 @@ mod tests {
     }
     #[test]
     fn given_no_column_should_not_generate_file() {
-        init();
         let columns = Vec::new();
         let config = Config {
             columns,
