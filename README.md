@@ -17,13 +17,21 @@
 
 ---
 
+## 🏢 About
+
+Fakelake is actively developed and maintained by **[SOMA](https://www.linkedin.com/company/soma-smart/)** in Paris.
+
+**Any feedback is welcome!** Feel free to open an issue or start a discussion.
+
+---
+
 ## 🚀 Why Fakelake?
 
 **Fakelake** is a lightning-fast command-line tool that generates realistic fake data from simple YAML configurations. Perfect for load testing, database seeding, development, and data pipeline testing.
 
 ### ✨ Key Highlights
 
-- **Blazingly Fast**: Generate millions of rows in seconds - up to **53x faster** than Python alternatives
+- **Fast**: Generate millions of rows in seconds - up to **53x faster** than Python alternatives
 - **Lightweight**: Small binary size with minimal memory footprint
 - **Simple**: Define your data schema in YAML, get results instantly
 - **Reliable**: Written in pure Rust with zero unsafe code
@@ -435,10 +443,3 @@ Contributions are welcome! Whether it's bug reports, feature requests, or code c
 
 Distributed under the **MIT License**. See [`LICENSE.txt`](LICENSE.txt) for more information.
 
----
-
-## 🏢 About
-
-Fakelake is actively developed and maintained by **[SOMA](https://www.linkedin.com/company/soma-smart/)** in Paris.
-
-**Any feedback is welcome!** Feel free to open an issue or start a discussion.
