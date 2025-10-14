@@ -3,12 +3,21 @@ site_url: https://soma-smart.github.io/Fakelake/
 site_author: SOMA
 site_description: Documentation about FakeLake, a command line tool that generates fake data from a YAML schema.
 
+repo_name: soma-smart/Fakelake
+repo_url: https://github.com/soma-smart/Fakelake
+edit_uri: edit/main/docs/
+
+extra:
+  homepage: https://github.com/soma-smart/Fakelake
+  company: https://www.linkedin.com/company/soma-smart/
+
 theme:
   name: readthedocs
   locale: en
   highlightjs: true
   hljs_languages:
     - yaml
+  custom_dir: docs/overrides
 
 nav:
   - 'Home': 'index.md'
